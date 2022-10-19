@@ -13,14 +13,21 @@ if (isMainThread){
   console.time('prime');
   for( let i = 0; i < threadCount -1; i++ ){
     const wStart = start;
+    console.log(start);
+    console.log(range);
     threads.add(new Worker(__filename, {
       workerData : { start : wStart, range }
     }));
+    if(i===0){
+      start -= 1;
+    }
     start += range;
   }
   threads.add(new Worker(__filename, {
-    workerData : { start, range: range + ((max - min + 1 ) % threadCount )}
+    workerData : { start, range }
   }))
+  console.log(start);
+  console.log(range);
   for (let worker of threads){
     worker.on('exit', ()=>{
       threads.delete(worker);
@@ -37,6 +44,8 @@ if (isMainThread){
   findPrimes(workerData.start, workerData.range);
   parentPort.postMessage(primes);
 }
+
+
 
 function findPrimes(start, range){
   let isPrime = true;
